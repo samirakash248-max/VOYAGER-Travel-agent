@@ -6,15 +6,32 @@
       margin: 0;
       padding: 0;
     }
-    
+
+    :root {
+      --navy: #0a1628;
+      --deep: #0d2040;
+      --teal: #1a6b72;
+      --aqua: #2cb5c0;
+      --gold: #e8a830;
+      --amber: #f5c842;
+      --white: #ffffff;
+      --light: #f4f6f9;
+      --muted: #8898aa;
+      --text: #1e2d3d;
+      --card-bg: #ffffff;
+      --radius: 14px;
+      --shadow: 0 8px 40px rgba(10, 22, 40, 0.12);
+      --transition: 0.35s cubic-bezier(.4, 0, .2, 1);
+    }
+
     html {
       scroll-behavior: smooth;
     }
 
     body {
       font-family: 'DM Sans', sans-serif;
-      color: rgb(30, 45, 61);
-      background: #ffffff;
+      color: var(--text);
+      background: var(--white);
       overflow-x: hidden;
     }
 
@@ -33,22 +50,22 @@
       background: rgba(10, 22, 40, 0.92);
       backdrop-filter: blur(16px);
       border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-      transition: background 0.35s cubic-bezier(.4, 0, .2, 1);
+      transition: background var(--transition);
     }
 
-    .nav-logo { 
+    .nav-logo {
       display: flex;
       align-items: center;
       font-family: 'Cormorant Garamond', serif;
       font-size: 2rem;
       font-weight: 700;
-      color: #ffffff;
+      color: var(--white);
       text-decoration: none;
       letter-spacing: 0.02em;
     }
 
     .nav-logo span {
-      color:rgb(232, 168, 48);
+      color: var(--gold);
     }
 
     .nav-logo svg {
@@ -70,30 +87,28 @@
       font-weight: 500;
       letter-spacing: 0.04em;
       text-transform: uppercase;
-      transition: color 0.35s cubic-bezier(.4, 0, .2, 1);
+      transition: color var(--transition);
     }
 
     .nav-links a:hover {
-      color: rgb(232, 168, 48);
+      color: var(--gold);
     }
 
     .nav-links a.active {
-      color: rgb(232, 168, 48);
+      color: var(--gold);
     }
 
     .nav-cta {
-      background: rgb(232, 168, 48);
-      color: rgb(10, 22, 40) !important;
+      background: var(--gold);
+      color: var(--navy) !important;
       padding: 0.5rem 1.25rem;
-      border : none;
-      cursor: pointer;
       border-radius: 50px;
       font-weight: 600 !important;
-      transition: background 0.35s cubic-bezier(.4, 0, .2, 1), transform 0.35s cubic-bezier(.4, 0, .2, 1) !important;
+      transition: background var(--transition), transform var(--transition) !important;
     }
 
     .nav-cta:hover {
-      background: rgb(245, 200, 66) !important;
+      background: var(--amber) !important;
       transform: translateY(-1px);
     }
 
@@ -109,9 +124,9 @@
       display: block;
       width: 24px;
       height: 2px;
-      background: #ffffff;
+      background: var(--white);
       border-radius: 2px;
-      transition: 0.35s cubic-bezier(.4, 0, .2, 1);
+      transition: var(--transition);
     }
 
     /* ── Hero ── */
@@ -120,7 +135,7 @@
       min-height: 100vh;
       display: flex;
       align-items: center;
-      background: linear-gradient(135deg, rgb(10, 22, 40) 0%, rgb(13, 42, 69) 40%, rgb(14, 59, 80) 100%);
+      background: linear-gradient(135deg, #0a1628 0%, #0d2a45 40%, #0e3b50 100%);
       overflow: hidden;
     }
 
@@ -151,7 +166,7 @@
       font-size: 0.8rem;
       letter-spacing: 0.25em;
       text-transform: uppercase;
-      color: rgb(232, 168, 48);
+      color: var(--gold);
       font-weight: 500;
       margin-bottom: 1.2rem;
       animation: fadeUp 0.8s ease both;
@@ -161,7 +176,7 @@
       font-family: 'Cormorant Garamond', serif;
       font-size: clamp(2.8rem, 7vw, 5.5rem);
       font-weight: 700;
-      color: #ffffff;
+      color: var(--white);
       line-height: 1.05;
       letter-spacing: -0.01em;
       margin-bottom: 1.5rem;
@@ -169,7 +184,7 @@
     }
 
     .hero-title em {
-      color: rgb(44, 181, 192);
+      color: var(--aqua);
       font-style: normal;
     }
 
@@ -185,7 +200,7 @@
     /* Search bar */
     .search-bar {
       background: rgba(255, 255, 255, 0.97);
-      border-radius: 14px;
+      border-radius: var(--radius);
       padding: 0.6rem 0.6rem 0.6rem 1.2rem;
       display: flex;
       flex-wrap: wrap;
@@ -208,7 +223,7 @@
       font-weight: 600;
       letter-spacing: 0.1em;
       text-transform: uppercase;
-      color: rgb(136, 152, 170);
+      color: var(--muted);
       margin-bottom: 2px;
     }
 
@@ -219,7 +234,7 @@
       font-family: 'DM Sans', sans-serif;
       font-size: 0.9rem;
       font-weight: 500;
-      color: rgb(30, 45, 61);
+      color: var(--text);
       background: transparent;
       cursor: pointer;
     }
@@ -227,13 +242,13 @@
     .search-divider {
       width: 1px;
       height: 36px;
-      background: rgb(226, 232, 240);
+      background: #e2e8f0;
       flex-shrink: 0;
     }
 
     .search-btn {
-      background: rgb(232, 168, 48);
-      color: rgb(10, 22, 40);
+      background: var(--gold);
+      color: var(--navy);
       border: none;
       border-radius: 10px;
       padding: 0.85rem 1.6rem;
@@ -245,12 +260,12 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      transition: background 0.35s cubic-bezier(.4, 0, .2, 1), transform 0.35s cubic-bezier(.4, 0, .2, 1);
+      transition: background var(--transition), transform var(--transition);
       letter-spacing: 0.02em;
     }
 
     .search-btn:hover {
-      background: rgb(245, 200, 66);
+      background: var(--amber);
       transform: translateY(-1px);
     }
 
@@ -269,12 +284,12 @@
       font-family: 'Cormorant Garamond', serif;
       font-size: 2rem;
       font-weight: 700;
-      color: #ffffff;
+      color: var(--white);
       line-height: 1;
     }
 
     .stat-num span {
-      color: rgb(232, 168, 48);
+      color: var(--gold);
     }
 
     .stat-label {
@@ -294,7 +309,7 @@
       font-weight: 700;
       letter-spacing: 0.2em;
       text-transform: uppercase;
-      color: rgb(26, 107, 114);
+      color: var(--teal);
       margin-bottom: 0.8rem;
     }
 
@@ -302,7 +317,7 @@
       font-family: 'Cormorant Garamond', serif;
       font-size: clamp(2rem, 4vw, 3rem);
       font-weight: 700;
-      color: rgb(10, 22, 40);
+      color: var(--navy);
       line-height: 1.15;
       letter-spacing: -0.01em;
       margin-bottom: 1rem;
@@ -310,7 +325,7 @@
 
     .section-sub {
       font-size: 1rem;
-      color: rgb(136, 152, 170);
+      color: var(--muted);
       max-width: 480px;
       line-height: 1.7;
     }
@@ -327,12 +342,12 @@
     .view-all {
       font-size: 0.85rem;
       font-weight: 600;
-      color: rgb(26, 107, 114);
+      color: var(--teal);
       text-decoration: none;
       display: flex;
       align-items: center;
       gap: 6px;
-      transition: gap 0.35s cubic-bezier(.4, 0, .2, 1);
+      transition: gap var(--transition);
     }
 
     .view-all:hover {
@@ -341,7 +356,7 @@
 
     /* ── Popular Destinations ── */
     .destinations {
-      background: rgb(244, 246, 249);
+      background: var(--light);
     }
 
     .dest-grid {
@@ -351,13 +366,13 @@
     }
 
     .dest-card {
-      border-radius: 14px;
+      border-radius: var(--radius);
       overflow: hidden;
       position: relative;
       aspect-ratio: 4/5;
       cursor: pointer;
-      box-shadow: 0 8px 40px rgba(10, 22, 40, 0.12);
-      transition: transform 0.35s cubic-bezier(.4, 0, .2, 1), box-shadow 0.35s cubic-bezier(.4, 0, .2, 1);
+      box-shadow: var(--shadow);
+      transition: transform var(--transition), box-shadow var(--transition);
     }
 
     .dest-card:first-child {
@@ -397,8 +412,8 @@
 
     .dest-badge {
       display: inline-block;
-      background: rgb(232, 168, 48);
-      color: rgb(10, 22, 40);
+      background: var(--gold);
+      color: var(--navy);
       font-size: 0.65rem;
       font-weight: 700;
       letter-spacing: 0.1em;
@@ -412,7 +427,7 @@
       font-family: 'Cormorant Garamond', serif;
       font-size: 1.5rem;
       font-weight: 700;
-      color: #ffffff;
+      color: var(--white);
       line-height: 1.2;
     }
 
@@ -426,7 +441,7 @@
     .dest-price {
       font-size: 1rem;
       font-weight: 700;
-      color: rgb(232, 168, 48);
+      color: var(--gold);
     }
 
     .dest-nights {
@@ -437,25 +452,25 @@
     .dest-btn {
       background: rgba(255, 255, 255, 0.18);
       border: 1px solid rgba(255, 255, 255, 0.3);
-      color: #ffffff;
+      color: var(--white);
       padding: 6px 16px;
       border-radius: 50px;
       font-size: 0.75rem;
       font-weight: 600;
       cursor: pointer;
       backdrop-filter: blur(8px);
-      transition: background 0.35s cubic-bezier(.4, 0, .2, 1);
+      transition: background var(--transition);
     }
 
     .dest-btn:hover {
-      background: rgb(232, 168, 48);
-      border-color: rgb(232, 168, 48);
-      color: rgb(10, 22, 40);
+      background: var(--gold);
+      border-color: var(--gold);
+      color: var(--navy);
     }
 
     /* ── Packages ── */
     .packages {
-      background: #ffffff;
+      background: var(--white);
     }
 
     .pkg-grid {
@@ -465,17 +480,17 @@
     }
 
     .pkg-card {
-      background: #ffffff;
-      border-radius: 14px;
+      background: var(--card-bg);
+      border-radius: var(--radius);
       overflow: hidden;
       box-shadow: 0 2px 20px rgba(10, 22, 40, 0.07);
       border: 1px solid rgba(10, 22, 40, 0.06);
-      transition: transform 0.35s cubic-bezier(.4, 0, .2, 1), box-shadow 0.35s cubic-bezier(.4, 0, .2, 1);
+      transition: transform var(--transition), box-shadow var(--transition);
     }
 
     .pkg-card:hover {
       transform: translateY(-5px);
-      box-shadow: 0 8px 40px rgba(10, 22, 40, 0.12);
+      box-shadow: var(--shadow);
     }
 
     .pkg-img {
@@ -499,8 +514,8 @@
       position: absolute;
       top: 12px;
       left: 12px;
-      background: rgb(10, 22, 40);
-      color: #ffffff;
+      background: var(--navy);
+      color: var(--white);
       font-size: 0.65rem;
       font-weight: 700;
       letter-spacing: 0.1em;
@@ -510,7 +525,7 @@
     }
 
     .pkg-tag.hot {
-      background: rgb(231, 76, 60);
+      background: #e74c3c;
     }
 
     .pkg-body {
@@ -525,32 +540,32 @@
     }
 
     .stars {
-      color: rgb(232, 168, 48);
+      color: var(--gold);
       font-size: 0.8rem;
     }
 
     .rating-val {
       font-size: 0.8rem;
       font-weight: 600;
-      color: rgb(30, 45, 61);
+      color: var(--text);
     }
 
     .rating-cnt {
       font-size: 0.75rem;
-      color: rgb(136, 152, 170);
+      color: var(--muted);
     }
 
     .pkg-name {
       font-family: 'Cormorant Garamond', serif;
       font-size: 1.25rem;
       font-weight: 700;
-      color: rgb(10, 22, 40);
+      color: var(--navy);
       margin-bottom: 0.4rem;
     }
 
     .pkg-loc {
       font-size: 0.8rem;
-      color: rgb(136, 152, 170);
+      color: var(--muted);
       display: flex;
       align-items: center;
       gap: 4px;
@@ -567,7 +582,7 @@
     .feat-chip {
       font-size: 0.72rem;
       font-weight: 500;
-      color: rgb(26, 107, 114);
+      color: var(--teal);
       background: rgba(26, 107, 114, 0.08);
       padding: 4px 10px;
       border-radius: 50px;
@@ -583,25 +598,25 @@
 
     .pkg-price-label {
       font-size: 0.7rem;
-      color: rgb(136, 152, 170);
+      color: var(--muted);
     }
 
     .pkg-price {
       font-size: 1.4rem;
       font-weight: 700;
-      color: rgb(10, 22, 40);
+      color: var(--navy);
       font-family: 'Cormorant Garamond', serif;
     }
 
     .pkg-price span {
       font-size: 0.75rem;
       font-weight: 400;
-      color: rgb(136, 152, 170);
+      color: var(--muted);
     }
 
     .pkg-book {
-      background: rgb(10, 22, 40);
-      color: #ffffff;
+      background: var(--navy);
+      color: var(--white);
       border: none;
       padding: 0.6rem 1.2rem;
       border-radius: 8px;
@@ -609,21 +624,21 @@
       font-size: 0.8rem;
       font-weight: 600;
       cursor: pointer;
-      transition: background 0.35s cubic-bezier(.4, 0, .2, 1);
+      transition: background var(--transition);
     }
 
     .pkg-book:hover {
-      background: rgb(26, 107, 114);
+      background: var(--teal);
     }
 
     /* ── Why Us ── */
     .why-us {
-      background: rgb(10, 22, 40);
-      color: #ffffff;
+      background: var(--navy);
+      color: var(--white);
     }
 
     .why-us .section-title {
-      color: #ffffff;
+      color: var(--white);
     }
 
     .why-us .section-sub {
@@ -640,9 +655,9 @@
     .why-card {
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 14px;
+      border-radius: var(--radius);
       padding: 2rem 1.5rem;
-      transition: background 0.35s cubic-bezier(.4, 0, .2, 1), transform 0.35s cubic-bezier(.4, 0, .2, 1);
+      transition: background var(--transition), transform var(--transition);
     }
 
     .why-card:hover {
@@ -654,7 +669,7 @@
       width: 52px;
       height: 52px;
       border-radius: 14px;
-      background: linear-gradient(135deg, rgb(26, 107, 114), rgb(44, 181, 192));
+      background: linear-gradient(135deg, var(--teal), var(--aqua));
       display: flex;
       align-items: center;
       justify-content: center;
@@ -666,7 +681,7 @@
       font-family: 'Cormorant Garamond', serif;
       font-size: 1.2rem;
       font-weight: 700;
-      color: #ffffff;
+      color: var(--white);
       margin-bottom: 0.6rem;
     }
 
@@ -678,7 +693,7 @@
 
     /* ── Testimonials ── */
     .testimonials {
-      background: rgb(244, 246, 249);
+      background: var(--light);
     }
 
     .test-grid {
@@ -688,12 +703,12 @@
     }
 
     .test-card {
-      background: #ffffff;
-      border-radius: 14px;
+      background: var(--white);
+      border-radius: var(--radius);
       padding: 2rem;
       box-shadow: 0 2px 20px rgba(10, 22, 40, 0.06);
       border: 1px solid rgba(10, 22, 40, 0.06);
-      transition: transform 0.35s cubic-bezier(.4, 0, .2, 1);
+      transition: transform var(--transition);
     }
 
     .test-card:hover {
@@ -702,7 +717,7 @@
 
     .test-quote {
       font-size: 2.5rem;
-      color: rgb(232, 168, 48);
+      color: var(--gold);
       line-height: 1;
       margin-bottom: 0.5rem;
     }
@@ -710,7 +725,7 @@
     .test-text {
       font-size: 0.9rem;
       line-height: 1.75;
-      color: rgb(30, 45, 61);
+      color: var(--text);
       margin-bottom: 1.5rem;
     }
 
@@ -724,36 +739,36 @@
       width: 44px;
       height: 44px;
       border-radius: 50%;
-      background: linear-gradient(135deg, rgb(26, 107, 114), rgb(44, 181, 192));
+      background: linear-gradient(135deg, var(--teal), var(--aqua));
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 1.1rem;
       font-weight: 700;
-      color: #ffffff;
+      color: var(--white);
       flex-shrink: 0;
     }
 
     .test-name {
       font-size: 0.9rem;
       font-weight: 700;
-      color: rgb(10, 22, 40);
+      color: var(--navy);
     }
 
     .test-dest {
       font-size: 0.75rem;
-      color: rgb(136, 152, 170);
+      color: var(--muted);
     }
 
     .test-stars {
       font-size: 0.75rem;
-      color: rgb(232, 168, 48);
+      color: var(--gold);
       margin-top: 2px;
     }
 
     /* ── CTA Banner ── */
     .cta-banner {
-      background: linear-gradient(135deg, rgb(26, 107, 114) 0%, #0a7c85 50%, rgb(10, 22, 40) 100%);
+      background: linear-gradient(135deg, var(--teal) 0%, #0a7c85 50%, var(--navy) 100%);
       padding: 5rem 5%;
       text-align: center;
       position: relative;
@@ -771,7 +786,7 @@
       font-family: 'Cormorant Garamond', serif;
       font-size: clamp(2rem, 4vw, 3rem);
       font-weight: 700;
-      color: #ffffff;
+      color: var(--white);
       margin-bottom: 1rem;
       position: relative;
     }
@@ -796,8 +811,8 @@
     }
 
     .btn-primary {
-      background: rgb(232, 168, 48);
-      color: rgb(10, 22, 40);
+      background: var(--gold);
+      color: var(--navy);
       padding: 0.9rem 2.2rem;
       border-radius: 50px;
       font-family: 'DM Sans', sans-serif;
@@ -805,17 +820,17 @@
       font-weight: 700;
       border: none;
       cursor: pointer;
-      transition: background 0.35s cubic-bezier(.4, 0, .2, 1), transform 0.35s cubic-bezier(.4, 0, .2, 1);
+      transition: background var(--transition), transform var(--transition);
     }
 
     .btn-primary:hover {
-      background: rgb(245, 200, 66);
+      background: var(--amber);
       transform: translateY(-2px);
     }
 
     .btn-outline {
       background: transparent;
-      color: #ffffff;
+      color: var(--white);
       padding: 0.9rem 2.2rem;
       border-radius: 50px;
       font-family: 'DM Sans', sans-serif;
@@ -823,17 +838,17 @@
       font-weight: 600;
       border: 2px solid rgba(255, 255, 255, 0.4);
       cursor: pointer;
-      transition: border-color 0.35s cubic-bezier(.4, 0, .2, 1), background 0.35s cubic-bezier(.4, 0, .2, 1);
+      transition: border-color var(--transition), background var(--transition);
     }
 
     .btn-outline:hover {
-      border-color: #ffffff;
+      border-color: var(--white);
       background: rgba(255, 255, 255, 0.1);
     }
 
     /* ── Footer ── */
     footer {
-      background: rgb(10, 22, 40);
+      background: var(--navy);
       padding: 4rem 5% 2rem;
       color: rgba(255, 255, 255, 0.55);
     }
@@ -873,16 +888,16 @@
       color: rgba(255, 255, 255, 0.6);
       font-size: 0.85rem;
       text-decoration: none;
-      transition: background 0.35s cubic-bezier(.4, 0, .2, 1), color 0.35s cubic-bezier(.4, 0, .2, 1);
+      transition: background var(--transition), color var(--transition);
     }
 
     .social-btn:hover {
-      background: rgb(232, 168, 48);
-      color: rgb(10, 22, 40);
+      background: var(--gold);
+      color: var(--navy);
     }
 
     .footer-col h4 {
-      color: #ffffff;
+      color: var(--white);
       font-size: 0.85rem;
       font-weight: 700;
       letter-spacing: 0.08em;
@@ -901,11 +916,11 @@
       color: rgba(255, 255, 255, 0.5);
       text-decoration: none;
       font-size: 0.875rem;
-      transition: color 0.35s cubic-bezier(.4, 0, .2, 1);
+      transition: color var(--transition);
     }
 
     .footer-col ul li a:hover {
-      color: rgb(232, 168, 48);
+      color: var(--gold);
     }
 
     .footer-bottom {
