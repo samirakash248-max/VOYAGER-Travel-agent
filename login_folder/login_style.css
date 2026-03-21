@@ -56,9 +56,8 @@
     .nav-logo {
       display: flex;
       align-items: center;
-      gap: 10px;
       font-family: 'Cormorant Garamond', serif;
-      font-size: 1.6rem;
+      font-size: 2rem;
       font-weight: 700;
       color: var(--white);
       text-decoration: none;
