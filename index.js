@@ -11,24 +11,72 @@ document.addEventListener('DOMContentLoaded', () => {
     const status = document.getElementById('status');
     const generateBtn = form.querySelector('.generate');
 
-    let selectedBudget = "Moderate";
+    // Budget slider elements
+    const budgetSlider = document.getElementById('budgetSlider');
+    const budgetLabel = document.getElementById('budgetLabel');
 
-    // Chat history for multi-turn context
+    const BUDGET_LEVELS = ['', 'Budget', 'Moderate', 'Luxury'];
+    const BUDGET_AMOUNTS = ['', '< $50/day', '$50–150/day', '$150+/day'];
+
+    let selectedBudget = 'Moderate';
     let chatHistory = [];
 
-    /* ─── RANGE ─── */
+    /* ─── DURATION RANGE ─── */
     range.addEventListener('input', () => {
-        durationText.textContent = range.value + " Days";
+        durationText.textContent = range.value + ' Days';
     });
 
-    /* ─── BUDGET ─── */
-    document.querySelectorAll('.buttons button').forEach(btn => {
-        btn.addEventListener('click', () => {
-            document.querySelectorAll('.buttons button').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            selectedBudget = btn.textContent;
-        });
-    });
+    /* ─── BUDGET SLIDER ─── */
+    let displayedVal = 50;
+    let animFrame = null;
+
+    function updateBudgetUI() {
+        const targetVal = parseInt(budgetSlider.value);
+
+        // Animate the number counting up/down smoothly
+        if (animFrame) cancelAnimationFrame(animFrame);
+
+        function animateNumber() {
+            const diff = targetVal - displayedVal;
+            if (Math.abs(diff) < 1) {
+                displayedVal = targetVal;
+            } else {
+                // ease: move 25% of remaining distance per frame
+                displayedVal += diff * 0.25;
+            }
+
+            const rounded = Math.round(displayedVal / 10) * 10;
+            const label = rounded >= 500 ? '$500+/day' : `$${rounded}/day`;
+            selectedBudget = rounded >= 500 ? '$500+/day' : `$${targetVal}/day`;
+
+            // Update both display elements
+            budgetLabel.textContent = label;
+            const budgetValueEl = document.getElementById('budgetValue');
+            if (budgetValueEl) budgetValueEl.textContent = label;
+
+            // Color: green -> blue -> gold
+            const pct = targetVal / 500;
+            let color;
+            if (pct < 0.33) color = '#56ab2f';
+            else if (pct < 0.66) color = '#4facfe';
+            else color = '#f7971e';
+
+            budgetLabel.style.background = color + '44';
+
+            // Track fill based on real slider value (not animated)
+            const fillPct = (targetVal / 500) * 100;
+            budgetSlider.style.background = `linear-gradient(to right, ${color} ${fillPct}%, rgba(255,255,255,0.2) ${fillPct}%)`;
+
+            if (Math.abs(targetVal - displayedVal) >= 1) {
+                animFrame = requestAnimationFrame(animateNumber);
+            }
+        }
+
+        animFrame = requestAnimationFrame(animateNumber);
+    }
+
+    budgetSlider.addEventListener('input', updateBudgetUI);
+    updateBudgetUI();
 
     /* ─── NAV TABS ─── */
     document.getElementById('plannerTab').addEventListener('click', () => {
@@ -56,7 +104,6 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(place)}`);
             const data = await res.json();
-
             if (!data.length) return;
 
             const lat = parseFloat(data[0].lat);
@@ -73,39 +120,98 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             marker = L.marker([lat, lon]).addTo(map);
-
-            // FIX 3: Force Leaflet to recalculate size after container may have changed
             setTimeout(() => map.invalidateSize(), 100);
-
         } catch (e) {
-            console.log("Map error", e);
+            console.log('Map error', e);
         }
     }
 
     /* ─── FORMAT ITINERARY ─── */
-    // FIX 4: Now renders the full day-by-day itinerary, not just highlights
     function format(text) {
         try {
             const data = JSON.parse(text);
 
             const highlightsList = (data.highlights || [])
-                .map(h => `<li>✦ ${h}</li>`)
-                .join('');
+                .map(h => `<span class="highlight-pill">✦ ${h}</span>`).join('');
 
-            const daysList = (data.itinerary || []).map(day => `
-                <div class="day-card">
-                    <div class="day-header">Day ${day.day} — ${day.theme}</div>
-                    <div class="day-row"><span class="time-label">🌅 Morning</span> ${day.morning}</div>
-                    <div class="day-row"><span class="time-label">☀️ Afternoon</span> ${day.afternoon}</div>
-                    <div class="day-row"><span class="time-label">🌙 Evening</span> ${day.evening}</div>
+            // Budget breakdown
+            const bd = data.budgetBreakdown || {};
+            const budgetSection = bd.totalEstimate ? `
+                <div class="section-block">
+                    <div class="section-title">💰 Budget Breakdown</div>
+                    <div class="budget-grid">
+                        <div class="budget-item"><span class="bi-label">Total</span><span class="bi-val">${bd.totalEstimate || '—'}</span></div>
+                        <div class="budget-item"><span class="bi-label">Per Day</span><span class="bi-val">${bd.perDay || '—'}</span></div>
+                        <div class="budget-item"><span class="bi-label">🏨 Stay</span><span class="bi-val">${bd.accommodation || '—'}</span></div>
+                        <div class="budget-item"><span class="bi-label">🍜 Food</span><span class="bi-val">${bd.food || '—'}</span></div>
+                        <div class="budget-item"><span class="bi-label">🚗 Transport</span><span class="bi-val">${bd.transport || '—'}</span></div>
+                        <div class="budget-item"><span class="bi-label">🎟 Activities</span><span class="bi-val">${bd.activities || '—'}</span></div>
+                    </div>
+                </div>` : '';
+
+            // Transport
+            const tr = data.transport || {};
+            const localTransport = (tr.local || []).map(t => `<li class="transport-item">🚌 ${t}</li>`).join('');
+            const transportSection = (tr.international || tr.local) ? `
+                <div class="section-block">
+                    <div class="section-title">✈️ Getting There & Around</div>
+                    ${tr.international ? `<div class="transport-intl">✈️ ${tr.international}</div>` : ''}
+                    <ul class="transport-list">${localTransport}</ul>
+                </div>` : '';
+
+            // Hotels
+            const hotelsList = (data.hotels || []).map(h => `
+                <div class="hotel-card">
+                    <div class="hotel-header">
+                        <span class="hotel-name">${h.name}</span>
+                        <span class="hotel-price">${h.pricePerNight}</span>
+                    </div>
+                    <div class="hotel-meta">
+                        <span class="hotel-type hotel-type-${(h.type||'').toLowerCase().replace('-','')}">${h.type}</span>
+                        <span class="hotel-loc">📍 ${h.location}</span>
+                    </div>
+                    ${h.highlights ? `<div class="hotel-desc">${h.highlights}</div>` : ''}
                 </div>
             `).join('');
+            const hotelsSection = data.hotels?.length ? `
+                <div class="section-block">
+                    <div class="section-title">🏨 Recommended Hotels</div>
+                    ${hotelsList}
+                </div>` : '';
+
+            // Day cards
+            const daysList = (data.itinerary || []).map(day => {
+                const t = day.transport || {};
+                const transportHTML = t.vehicle ? `
+                    <div class="day-transport">
+                        <span class="transport-icon">🚗</span>
+                        <div class="transport-info">
+                            <span class="transport-vehicle">${t.vehicle}</span>
+                            ${t.details ? `<span class="transport-details">${t.details}</span>` : ''}
+                        </div>
+                        ${t.estimatedCost ? `<span class="transport-cost">${t.estimatedCost}</span>` : ''}
+                    </div>` : '';
+                return `
+                <div class="day-card">
+                    <div class="day-header">Day ${day.day} — ${day.theme}</div>
+                    <div class="day-row"><span class="time-label">🌅 Morning</span>${day.morning}</div>
+                    <div class="day-row"><span class="time-label">☀️ Afternoon</span>${day.afternoon}</div>
+                    <div class="day-row"><span class="time-label">🌙 Evening</span>${day.evening}</div>
+                    ${transportHTML}
+                </div>`;
+            }).join('');
 
             return `
                 <h2 style="margin-bottom:4px">${data.destination}</h2>
                 <p style="color:#555;margin-bottom:12px">${data.duration} • ${data.budgetLevel}</p>
-                <ul style="margin-bottom:16px;padding-left:18px">${highlightsList}</ul>
-                ${daysList}
+                <div class="highlights-row">${highlightsList}</div>
+                ${budgetSection}
+                ${transportSection}
+                ${hotelsSection}
+                <div class="section-block">
+                    <div class="section-title">🗓 Day by Day</div>
+                    ${daysList}
+                </div>
             `;
         } catch {
             return `<p>${text}</p>`;
@@ -114,10 +220,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     /* ─── GENERATE ─── */
     async function generate(prompt) {
-        // FIX 5: Disable button to prevent spam clicks
         generateBtn.disabled = true;
-        generateBtn.textContent = "Generating...";
-        updateStatus("✈️ Building your itinerary...");
+        generateBtn.textContent = 'Generating...';
+        updateStatus('✈️ Building your itinerary...');
 
         try {
             const res = await fetch('/generate', {
@@ -130,64 +235,75 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (data.success) {
                 output.innerHTML = format(data.itinerary);
-                // FIX 6: Clear status on success
-                updateStatus("✅ Itinerary ready!", 'success');
-
+                updateStatus('✅ Itinerary ready!', 'success');
                 try {
                     const parsed = JSON.parse(data.itinerary);
                     showMap(parsed.destination);
                 } catch {}
             } else {
                 output.innerHTML = `<p style="color:red">❌ ${data.error || 'Failed to generate itinerary'}</p>`;
-                updateStatus("Something went wrong.", 'error');
+                updateStatus('Something went wrong.', 'error');
             }
 
         } catch (err) {
             console.error(err);
             output.innerHTML = `<p style="color:red">❌ Server error. Is the server running?</p>`;
-            updateStatus("Server error.", 'error');
+            updateStatus('Server error.', 'error');
         } finally {
-            // FIX 5: Always re-enable button
             generateBtn.disabled = false;
-            generateBtn.textContent = "Generate ✨";
+            generateBtn.textContent = 'Generate ✨';
         }
     }
 
     /* ─── FORM SUBMIT ─── */
     form.addEventListener('submit', (e) => {
         e.preventDefault();
-
         if (!destination.value.trim()) {
-            updateStatus("Please enter a destination.", 'error');
+            updateStatus('Please enter a destination.', 'error');
             return;
         }
-
         const prompt = `${range.value} day trip to ${destination.value}. Budget: ${selectedBudget}. Interests: ${interests.value || 'general sightseeing'}`;
         generate(prompt);
     });
 
     /* ─── CHAT ─── */
-    // FIX 7: Chat assistant is now fully wired up
     const chatInput = document.getElementById('chatInput');
     const sendBtn = document.getElementById('sendBtn');
     const chatBox = document.getElementById('chatBox');
 
     function appendMessage(text, role) {
+        // Remove typing indicator if present
+        const typing = chatBox.querySelector('.typing-indicator');
+        if (typing) typing.remove();
+
         const div = document.createElement('div');
         div.className = `message ${role}`;
-        div.textContent = text;
+
+        const textDiv = document.createElement('div');
+        textDiv.className = 'message-text';
+        textDiv.textContent = text;
+        div.appendChild(textDiv);
+
+        chatBox.appendChild(div);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function showTyping() {
+        const div = document.createElement('div');
+        div.className = 'message bot typing-indicator';
+        div.innerHTML = '<div class="message-text"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>';
         chatBox.appendChild(div);
         chatBox.scrollTop = chatBox.scrollHeight;
     }
 
     async function sendMessage() {
         const msg = chatInput.value.trim();
-        if (!msg) return;
+        if (!msg || sendBtn.disabled) return;
 
         appendMessage(msg, 'user');
         chatInput.value = '';
         sendBtn.disabled = true;
-        sendBtn.textContent = "...";
+        showTyping();
 
         try {
             const res = await fetch('/chat', {
@@ -200,58 +316,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (data.success) {
                 appendMessage(data.reply, 'bot');
-                // Keep rolling history for multi-turn context
                 chatHistory.push({ role: 'user', text: msg });
                 chatHistory.push({ role: 'model', text: data.reply });
-                // Keep last 10 turns to avoid huge payloads
                 if (chatHistory.length > 20) chatHistory = chatHistory.slice(-20);
             } else {
-                appendMessage("Sorry, I couldn't get a response. Try again.", 'bot');
+                appendMessage('Sorry, I could not get a response right now. Try again in a moment.', 'bot');
             }
-
-        } catch (err) {
-            appendMessage("❌ Server error.", 'bot');
+        } catch {
+            appendMessage('❌ Cannot reach the server. Make sure it is running.', 'bot');
         } finally {
             sendBtn.disabled = false;
-            sendBtn.textContent = "Send";
+            chatInput.focus();
         }
     }
 
     sendBtn.addEventListener('click', sendMessage);
     chatInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') sendMessage();
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
     });
-
-    /* ─── ITINERARY CARD STYLES (injected so no style.css edit needed) ─── */
-    const style = document.createElement('style');
-    style.textContent = `
-        .day-card {
-            background: #f7f7fb;
-            border-radius: 8px;
-            padding: 12px 14px;
-            margin-bottom: 10px;
-            border-left: 4px solid #6c5ce7;
-        }
-        .day-header {
-            font-weight: 700;
-            margin-bottom: 8px;
-            color: #333;
-        }
-        .day-row {
-            font-size: 0.9em;
-            color: #444;
-            margin: 4px 0;
-            line-height: 1.5;
-        }
-        .time-label {
-            font-weight: 600;
-            margin-right: 6px;
-        }
-        .generate:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-    `;
-    document.head.appendChild(style);
 
 });
