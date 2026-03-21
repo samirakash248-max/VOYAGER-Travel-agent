@@ -43,7 +43,7 @@ function handleLogin(event) {
 
   // pretend we're calling an API (setTimeout simulates a delay)
   setTimeout(() => {
-    btn.textContent = "✅  Welcome back!";
+    btn.textContent = "Welcome back!";
     btn.style.background = "linear-gradient(135deg, #2ecc71, #27ae60)";
 
     // in a real project I'd redirect here: window.location.href = '/dashboard';

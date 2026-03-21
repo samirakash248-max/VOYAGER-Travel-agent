@@ -5,21 +5,6 @@
   box-sizing: border-box;
 }
 
-/* CSS variables so I don't have to repeat colors everywhere */
-:root {
-  --white: #ffffff;
-  --overlay-dark: rgba(10, 20, 40, 0.55);
-  --card-bg: rgba(255, 255, 255, 0.12);
-  --card-border: rgba(255, 255, 255, 0.25);
-  --accent: rgb(240, 165, 0);
-  --accent-hover: rgb(255, 184, 48);
-  --text-light: rgba(255, 255, 255, 0.75);
-  --input-bg: rgba(255, 255, 255, 0.1);
-  --input-border: rgba(255, 255, 255, 0.3);
-  --input-focus: rgba(240, 165, 0, 0.6);
-  --error: rgb(255, 107, 107);
-}
-
 body {
   font-family: 'Lato', sans-serif;
   min-height: 100vh;
