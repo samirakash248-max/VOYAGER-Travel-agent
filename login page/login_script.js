@@ -1,73 +1,113 @@
-// --- FORM VALIDATION ---
-
-// I wrote this function to check if the form inputs are valid
+// ── FORM VALIDATION ──
 function validateForm() {
   let isValid = true;
 
-  const emailInput = document.getElementById("email");
-  const passwordInput = document.getElementById("password");
-  const emailGroup = document.getElementById("emailGroup");
-  const passwordGroup = document.getElementById("passwordGroup");
+  const emailInput    = document.getElementById('email');
+  const passwordInput = document.getElementById('password');
+  const emailGroup    = document.getElementById('emailGroup');
+  const passwordGroup = document.getElementById('passwordGroup');
 
-  // reset errors first
-  emailGroup.classList.remove("has-error");
-  passwordGroup.classList.remove("has-error");
+  emailGroup.classList.remove('has-error');
+  passwordGroup.classList.remove('has-error');
+  hideServerError();
 
-  // check email - .includes('@') is a quick check but type="email" helps too
-  if (!emailInput.value || !emailInput.value.includes("@")) {
-    emailGroup.classList.add("has-error");
+  if (!emailInput.value || !emailInput.value.includes('@')) {
+    emailGroup.classList.add('has-error');
     isValid = false;
   }
 
-  // check password length
   if (passwordInput.value.length < 6) {
-    passwordGroup.classList.add("has-error");
+    passwordGroup.classList.add('has-error');
     isValid = false;
   }
 
   return isValid;
 }
 
-// this runs when the form is submitted
-function handleLogin(event) {
-  event.preventDefault(); // stop the browser from reloading
-
-  if (!validateForm()) return; // stop if there are errors
-
-  const btn = document.getElementById("loginBtn");
-
-  // show loading state while "logging in"
-  btn.textContent = "Logging you in...";
-  btn.disabled = true;
-  btn.style.opacity = "0.75";
-
-  // pretend we're calling an API (setTimeout simulates a delay)
-  setTimeout(() => {
-    btn.textContent = "Welcome back!";
-    btn.style.background = "linear-gradient(135deg, #2ecc71, #27ae60)";
-
-    // in a real project I'd redirect here: window.location.href = '/dashboard';
-    setTimeout(() => {
-      alert("Login successful! (Redirect to dashboard goes here)");
-      btn.textContent = "LOG IN";
-      btn.disabled = false;
-      btn.style.opacity = "1";
-      btn.style.background = "";
-    }, 1200);
-  }, 1800);
+// ── SERVER ERROR / SUCCESS BANNERS ──
+function showServerError(msg) {
+  const el = document.getElementById('serverError');
+  el.textContent = msg;
+  el.classList.add('visible');
 }
 
+function hideServerError() {
+  const el = document.getElementById('serverError');
+  el.classList.remove('visible');
+}
 
-// social login placeholder - connect OAuth later
+// ── HANDLE LOGIN — hits /auth/login on the Express server ──
+async function handleLogin(event) {
+  event.preventDefault();
+  if (!validateForm()) return;
+
+  const btn      = document.getElementById('loginBtn');
+  const email    = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
+  const remember = document.getElementById('rememberMe').checked;
+
+  // loading state
+  btn.textContent = 'Logging you in...';
+  btn.disabled    = true;
+
+  try {
+    const res  = await fetch('/auth/login', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ email, password, remember })
+    });
+
+    const data = await res.json();
+
+    if (res.ok && data.success) {
+      // success
+      btn.textContent        = '✅  Welcome back!';
+      btn.style.background   = 'linear-gradient(135deg, #2ecc71, #27ae60)';
+      btn.style.color        = 'white';
+
+      // redirect after short delay
+      setTimeout(() => {
+        window.location.href = data.redirect || '/';
+      }, 1000);
+
+    } else {
+      // server returned an error (wrong password, user not found, etc.)
+      showServerError(data.message || 'Login failed. Please try again.');
+      btn.textContent = 'LOG IN';
+      btn.disabled    = false;
+      btn.style.background = '';
+    }
+
+  } catch (err) {
+    // network error — server probably not running
+    showServerError('Cannot reach the server. Is it running?');
+    btn.textContent = 'LOG IN';
+    btn.disabled    = false;
+  }
+}
+
+// ── TOGGLE PASSWORD VISIBILITY ──
+function togglePassword() {
+  const input   = document.getElementById('password');
+  const icon    = document.getElementById('eyeIcon');
+  const showing = input.type === 'text';
+
+  input.type        = showing ? 'password' : 'text';
+  icon.className    = showing ? 'fa-regular fa-eye' : 'fa-regular fa-eye-slash';
+}
+
+// ── SOCIAL LOGIN (placeholder) ──
 function socialLogin(provider) {
   alert(`${provider} login coming soon! (OAuth integration needed)`);
 }
 
-// clear error styling when user starts typing again
-document.getElementById("email").addEventListener("input", function () {
-  document.getElementById("emailGroup").classList.remove("has-error");
+// ── CLEAR ERRORS ON INPUT ──
+document.getElementById('email').addEventListener('input', () => {
+  document.getElementById('emailGroup').classList.remove('has-error');
+  hideServerError();
 });
 
-document.getElementById("password").addEventListener("input", function () {
-  document.getElementById("passwordGroup").classList.remove("has-error");
+document.getElementById('password').addEventListener('input', () => {
+  document.getElementById('passwordGroup').classList.remove('has-error');
+  hideServerError();
 });
