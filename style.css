@@ -1,5 +1,164 @@
 body{
     background-image: url("./voyager_background.jpeg");
+    height: 100vh;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", sans-serif;
+}
+
+
+/* NAVBAR */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 40px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-radius: 30px;
+  margin: 20px;
+}
+
+.logo {
+  font-weight: bold;
+  font-size: 20px;
+}
+
+.logo span {
+  color: #a855f7;
+}
+
+.nav-links button {
+  margin: 0 10px;
+  padding: 8px 16px;
+  background: transparent;
+  border: none;
+  color: #ccc;
+  cursor: pointer;
+}
+
+.nav-links .active {
+  background: rgba(255,255,255,0.1);
+  border-radius: 20px;
+  color: #fff;
+}
+
+.profile {
+  background: rgba(255,255,255,0.1);
+  padding: 8px 15px;
+  border-radius: 20px;
+}
+
+/* LAYOUT */
+.container {
+  display: flex;
+  padding: 40px;
+  gap: 40px;
+}
+
+/* CARD */
+.card {
+  width: 350px;
+  padding: 25px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(15px);
+}
+
+.card h2 {
+  margin-bottom: 20px;
+}
+
+.card label {
+  display: block;
+  margin-top: 15px;
+  margin-bottom: 5px;
+  color: #bbb;
+}
+
+.card input,
+.card textarea {
+  width: 100%;
+  padding: 10px;
+  border-radius: 12px;
+  border: none;
+  outline: none;
+  background: rgba(255,255,255,0.05);
+  color: white;
+}
+
+.card textarea {
+  height: 80px;
+  resize: none;
+}
+
+/* ROW */
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* BUTTON GROUP */
+.buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.buttons button {
+  flex: 1;
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+  background: rgba(255,255,255,0.05);
+  color: #ccc;
+  cursor: pointer;
+}
+
+.buttons .active {
+  background: #22d3ee;
+  color: black;
+}
+
+/* GENERATE BUTTON */
+.generate {
+  margin-top: 20px;
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 20px;
+  background: linear-gradient(90deg, #22d3ee, #a855f7);
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* RIGHT PANEL */
+.preview {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.box {
+  border: 1px dashed rgba(255,255,255,0.2);
+  padding: 40px;
+  border-radius: 20px;
+  text-align: center;
+  max-width: 400px;
+}
+
+.box h2 {
+  margin-bottom: 10px;
+}
+
+.box p {
+  color: #aaa;
 }
 /* MAIN CONTAINER */
 .container {
