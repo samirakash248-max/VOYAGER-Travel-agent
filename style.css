@@ -1,3 +1,31 @@
 body{
     background-image: url("./voyager_background.jpeg");
 }
+/* MAIN CONTAINER */
+.container {
+    display: flex;
+    gap: 20px;
+    padding: 20px;
+    align-items: flex-start;
+}
+
+/* LEFT PANEL (CARD) */
+.card {
+    width: 350px;        /* 👈 THIS is the key */
+    flex-shrink: 0;      /* prevents stretching */
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+}
+
+/* RIGHT PANEL */
+.preview {
+    flex: 1;             /* takes remaining space */
+}
+
+.box {
+    background: #f5f5f5;
+    padding: 30px;
+    border-radius: 15px;
+}
