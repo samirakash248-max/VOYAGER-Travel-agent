@@ -13,3 +13,18 @@ document.querySelectorAll(".nav-links a").forEach((a) => {
     document.getElementById("navLinks").classList.remove("open");
   });
 });
+
+// Card click — go to app if logged in, else login
+async function bookPackage(destination) {
+  try {
+    const res  = await fetch('/api/me');
+    const data = await res.json();
+    if (data.loggedIn) {
+      window.location.href = '/app?dest=' + encodeURIComponent(destination);
+    } else {
+      window.location.href = '/login?dest=' + encodeURIComponent(destination);
+    }
+  } catch {
+    window.location.href = '/login?dest=' + encodeURIComponent(destination);
+  }
+}
