@@ -21,58 +21,47 @@ document.addEventListener('DOMContentLoaded', () => {
     let selectedBudget = 'Moderate';
     let chatHistory = [];
 
+    /* ─── FETCH USER NAME ─── */
+    fetch('/api/me')
+        .then(r => r.json())
+        .then(data => {
+            const el = document.querySelector('.profile');
+            if (el && data.name) el.textContent = data.name;
+        })
+        .catch(() => {});
+
+    /* ─── LOGOUT ─── */
+    window.handleLogout = async function() {
+        try {
+            await fetch('/auth/logout', { method: 'POST' });
+        } catch {}
+        window.location.href = '/';
+    };
+
+    /* ─── PRE-FILL DESTINATION FROM URL PARAM ─── */
+    const urlParams = new URLSearchParams(window.location.search);
+    const destParam = urlParams.get('dest');
+    if (destParam) {
+        destination.value = destParam;
+        // clean URL without reloading
+        window.history.replaceState({}, '', '/app');
+    }
+
     /* ─── DURATION RANGE ─── */
     range.addEventListener('input', () => {
         durationText.textContent = range.value + ' Days';
     });
 
     /* ─── BUDGET SLIDER ─── */
-    let displayedVal = 50;
-    let animFrame = null;
-
     function updateBudgetUI() {
-        const targetVal = parseInt(budgetSlider.value);
+        const val = parseInt(budgetSlider.value);
+        const max = parseInt(budgetSlider.max);
+        const label = val >= max ? '$' + max + '+/day' : '$' + val + '/day';
 
-        // Animate the number counting up/down smoothly
-        if (animFrame) cancelAnimationFrame(animFrame);
-
-        function animateNumber() {
-            const diff = targetVal - displayedVal;
-            if (Math.abs(diff) < 1) {
-                displayedVal = targetVal;
-            } else {
-                // ease: move 25% of remaining distance per frame
-                displayedVal += diff * 0.25;
-            }
-
-            const rounded = Math.round(displayedVal / 10) * 10;
-            const label = rounded >= 500 ? '$500+/day' : `$${rounded}/day`;
-            selectedBudget = rounded >= 500 ? '$500+/day' : `$${targetVal}/day`;
-
-            // Update both display elements
-            budgetLabel.textContent = label;
-            const budgetValueEl = document.getElementById('budgetValue');
-            if (budgetValueEl) budgetValueEl.textContent = label;
-
-            // Color: green -> blue -> gold
-            const pct = targetVal / 500;
-            let color;
-            if (pct < 0.33) color = '#56ab2f';
-            else if (pct < 0.66) color = '#4facfe';
-            else color = '#f7971e';
-
-            budgetLabel.style.background = color + '44';
-
-            // Track fill based on real slider value (not animated)
-            const fillPct = (targetVal / 500) * 100;
-            budgetSlider.style.background = `linear-gradient(to right, ${color} ${fillPct}%, rgba(255,255,255,0.2) ${fillPct}%)`;
-
-            if (Math.abs(targetVal - displayedVal) >= 1) {
-                animFrame = requestAnimationFrame(animateNumber);
-            }
-        }
-
-        animFrame = requestAnimationFrame(animateNumber);
+        selectedBudget = label;
+        budgetLabel.textContent = label;
+        const budgetValueEl = document.getElementById('budgetValue');
+        if (budgetValueEl) budgetValueEl.textContent = label;
     }
 
     budgetSlider.addEventListener('input', updateBudgetUI);
@@ -201,6 +190,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>`;
             }).join('');
 
+            // Safety tips
+            const safetySection = (data.safetyTips?.length) ? `
+                <div class="section-block">
+                    <div class="section-title">🛡️ Safety Tips for ${data.destination.split(",")[0]}</div>
+                    <div class="safety-grid">
+                        ${(data.safetyTips || []).map(cat => `
+                            <div class="safety-card">
+                                <div class="safety-category">${cat.category}</div>
+                                <ul class="safety-list">
+                                    ${(cat.tips || []).map(tip => `<li>${tip}</li>`).join("")}
+                                </ul>
+                            </div>
+                        `).join("")}
+                    </div>
+                </div>` : "";
+
             return `
                 <h2 style="margin-bottom:4px">${data.destination}</h2>
                 <p style="color:#555;margin-bottom:12px">${data.duration} • ${data.budgetLevel}</p>
@@ -212,6 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="section-title">🗓 Day by Day</div>
                     ${daysList}
                 </div>
+                ${safetySection}
             `;
         } catch {
             return `<p>${text}</p>`;
