@@ -278,7 +278,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const chatBox = document.getElementById('chatBox');
 
     function appendMessage(text, role) {
-        // Remove typing indicator if present
         const typing = chatBox.querySelector('.typing-indicator');
         if (typing) typing.remove();
 
@@ -287,9 +286,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const textDiv = document.createElement('div');
         textDiv.className = 'message-text';
-        textDiv.textContent = text;
-        div.appendChild(textDiv);
 
+        // Render bullet points as proper lines with spacing
+        const formatted = text
+            .split('\n')
+            .map(line => {
+                line = line.trim();
+                if (!line) return null;
+                if (line.startsWith('• ') || line.startsWith('- ')) {
+                    const span = document.createElement('div');
+                    span.style.cssText = 'display:flex;gap:8px;margin:4px 0;';
+                    span.innerHTML = '<span style="color:#e8a87c;flex-shrink:0">•</span><span>' + line.replace(/^[•\-]\s*/, '') + '</span>';
+                    return span;
+                }
+                const p = document.createElement('p');
+                p.style.margin = '4px 0';
+                p.textContent = line;
+                return p;
+            })
+            .filter(Boolean);
+
+        formatted.forEach(el => textDiv.appendChild(el));
+        div.appendChild(textDiv);
         chatBox.appendChild(div);
         chatBox.scrollTop = chatBox.scrollHeight;
     }
