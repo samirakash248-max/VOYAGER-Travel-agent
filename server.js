@@ -18,11 +18,57 @@ app.use(cookieParser());
 // ── Auth routes (/auth/login, /auth/register, /auth/logout) ──
 app.use("/auth", authRouter);
 
-// ── Login page ──
-app.get("/login", (req, res) => res.sendFile("login_index.html", { root: "." }));
-app.get("/register", (req, res) => res.sendFile("register_index.html", { root: "." }));
+// ── Page routes ──
+app.get("/",        (req, res) => res.sendFile("landing_page.html", { root: "." }));
+app.get("/packages",(req, res) => res.sendFile("landing_page2.html", { root: "." }));
+app.get("/login",   (req, res) => res.sendFile("login_index.html",   { root: "." }));
+app.get("/register",(req, res) => res.sendFile("register_index.html",{ root: "." }));
+
+// ── App page — inject user name from JWT into the HTML ──
+app.get("/app", async (req, res) => {
+    const token = req.cookies?.token;
+    let userName = "Traveler";
+
+    if (token) {
+        try {
+            const { default: jwt } = await import("jsonwebtoken");
+            const decoded = jwt.verify(token, process.env.JWT_SECRET || "change_this_in_production");
+            const { MongoClient, ObjectId } = await import("mongodb");
+            const client = new MongoClient(process.env.MONGO_URI || "mongodb://localhost:27017");
+            await client.connect();
+            const db   = client.db(process.env.MONGO_DB_NAME || "voyager");
+            const user = await db.collection("users").findOne({ _id: new ObjectId(decoded.id) });
+            await client.close();
+            if (user?.name) userName = user.name;
+        } catch {}
+    }
+
+    let html = await import("fs").then(fs => fs.promises.readFile("index.html", "utf8"));
+    html = html.replace('>Traveler<', `>${userName}<`);
+    res.send(html);
+});
 
 app.use(express.static("."));
+
+
+// ── API: get current user info ──
+app.get("/api/me", async (req, res) => {
+    const token = req.cookies?.token;
+    if (!token) return res.json({ loggedIn: false, name: "Traveler" });
+    try {
+        const { default: jwt } = await import("jsonwebtoken");
+        const decoded = jwt.verify(token, process.env.JWT_SECRET || "change_this_in_production");
+        const { MongoClient, ObjectId } = await import("mongodb");
+        const client = new MongoClient(process.env.MONGO_URI || "mongodb://localhost:27017");
+        await client.connect();
+        const db   = client.db(process.env.MONGO_DB_NAME || "voyager");
+        const user = await db.collection("users").findOne({ _id: new ObjectId(decoded.id) });
+        await client.close();
+        res.json({ loggedIn: true, name: user?.name || "Traveler" });
+    } catch {
+        res.json({ loggedIn: false, name: "Traveler" });
+    }
+});
 
 console.log("🔑 API Key:", API_KEY ? "Loaded ✅" : "Missing ❌");
 
@@ -159,6 +205,28 @@ Schema:
         "estimatedCost": "$X"
       }
     }
+  ],
+  "safetyTips": [
+    {
+      "category": "Health & Medical",
+      "tips": ["tip1", "tip2"]
+    },
+    {
+      "category": "Transport Safety",
+      "tips": ["tip1", "tip2"]
+    },
+    {
+      "category": "Cultural Etiquette",
+      "tips": ["tip1", "tip2"]
+    },
+    {
+      "category": "Scams & Theft",
+      "tips": ["tip1", "tip2"]
+    },
+    {
+      "category": "Emergency Contacts",
+      "tips": ["Local emergency number", "Nearest embassy info"]
+    }
   ]
 }
 
@@ -170,6 +238,7 @@ IMPORTANT RULES:
 - If day 2 goes to the mountains, say "Rent a scooter from the city center, ~$15/day".
 - Vehicle choices must match the user's budget (e.g. budget travellers use public transit, luxury travellers use private cars/taxis).
 - Tailor ALL recommendations (hotels, transport, activities) strictly to the user's stated budget per day.
+- Safety tips must be specific to the destination — not generic advice.
 Output ONLY the JSON object. Start with { and end with }.`;
 
         const result = await callGemini(systemPrompt);
@@ -247,10 +316,7 @@ app.post("/chat", async (req, res) => {
     }
 });
 
-// Root
-app.get("/", (req, res) => {
-    res.sendFile("index.html", { root: "." });
-});
+// Root route handled above
 
 app.listen(PORT, () => {
     console.log(`\n🚀 Server running at http://localhost:${PORT}`);
