@@ -7,7 +7,7 @@
   <title>Voyager</title>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="landing_style.css">
-  <link rel="icon" href="img/voyager_icon.jpeg">
+  <link rel="icon" href="/img/voyager_icon.jpeg" type="image/jpeg">
 </head>
 <body>
 
@@ -53,16 +53,14 @@
       <div class="section-header">
         <div>
           <span class="section-tag">✦ Best Offers</span>
-          <h2 class="section-title">Our Top-Rated<br>Tour Destinations</h2>
+          <h2 class="section-title">Our Top-Rated<br>Tour Packages</h2>
           <p class="section-sub">Carefully crafted itineraries for every type of traveller and budget.</p>
         </div>
-        <a href="landing_page2.html" class="view-all">More Destinations →</a>
+        <a href="/packages" class="view-all">All Packages →</a>
       </div>
-
-      <!-- 1st destination -->
-
       <div class="pkg-grid">
-        <div class="pkg-card">
+
+        <div class="pkg-card" onclick="bookPackage('United Kingdom')" style="cursor:pointer">
           <div class="pkg-img">
             <img src="img/unitedKingdom.png" alt="UK"/>
             <span class="pkg-tag hot">🔥 Hot Deal</span>
@@ -83,9 +81,7 @@
           </div>
         </div>
 
-        <!-- 2nd destination -->
-
-        <div class="pkg-card">
+        <div class="pkg-card" onclick="bookPackage('Spain')" style="cursor:pointer">
           <div class="pkg-img">
             <img src="img/spain.png" alt="Spain"/>
             <span class="pkg-tag">New</span>
@@ -106,9 +102,7 @@
           </div>
         </div>
 
-        <!-- 3rd destination -->
-
-        <div class="pkg-card">
+        <div class="pkg-card" onclick="bookPackage('Istanbul')" style="cursor:pointer">
           <div class="pkg-img">
             <img src="img/Istanbul.png" alt="Turkey"/>
             <span class="pkg-tag hot">🔥 Hot Deal</span>
@@ -129,9 +123,7 @@
           </div>
         </div>
 
-        <!-- 4th destination -->
-         
-        <div class="pkg-card">
+        <div class="pkg-card" onclick="bookPackage('Japan')" style="cursor:pointer">
           <div class="pkg-img">
             <img src="img/Mt.fuji.png" alt="Japan"/>
             <span class="pkg-tag">Premium</span>
@@ -151,6 +143,7 @@
             </div>
           </div>
         </div>
+
       </div>
     </div>
   </section>
@@ -301,5 +294,10 @@
   </footer>
 
   <script src="landing_script.js"></script>
+  <script>
+    function bookPackage(destination) {
+      window.location.href = '/login?dest=' + encodeURIComponent(destination);
+    }
+  </script>
 </body>
 </html>
