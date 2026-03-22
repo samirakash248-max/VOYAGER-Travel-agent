@@ -65,9 +65,13 @@ async function handleLogin(event) {
       btn.style.background   = 'linear-gradient(135deg, #2ecc71, #27ae60)';
       btn.style.color        = 'white';
 
-      // redirect after short delay
+      // Always go to /app, carry dest param if present
+      const params = new URLSearchParams(window.location.search);
+      const dest   = params.get('dest');
+      const redirect = dest ? '/app?dest=' + encodeURIComponent(dest) : '/app';
+
       setTimeout(() => {
-        window.location.href = data.redirect || '/';
+        window.location.href = redirect;
       }, 1000);
 
     } else {
@@ -96,9 +100,22 @@ function togglePassword() {
   icon.className    = showing ? 'fa-regular fa-eye' : 'fa-regular fa-eye-slash';
 }
 
-// ── SOCIAL LOGIN (placeholder) ──
+// ── GOOGLE LOGIN ──
+function googleLogin() {
+  const params = new URLSearchParams(window.location.search);
+  const dest   = params.get('dest');
+  window.location.href = '/auth/google' + (dest ? '?dest=' + encodeURIComponent(dest) : '');
+}
+
+// ── FACEBOOK LOGIN (placeholder) ──
 function socialLogin(provider) {
-  alert(`${provider} login coming soon! (OAuth integration needed)`);
+  alert(`${provider} login coming soon!`);
+}
+
+// ── SHOW GOOGLE ERROR IF REDIRECTED BACK WITH ?error= ──
+const urlError = new URLSearchParams(window.location.search).get('error');
+if (urlError === 'google_failed') {
+  showServerError('Google login failed. Please try again.');
 }
 
 // ── CLEAR ERRORS ON INPUT ──
