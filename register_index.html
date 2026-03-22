@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VOYAGER - Sign Up</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="login_style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" />
+  </head>
+  <body>
+    <div class="page-wrapper">
+      <div class="login-card">
+
+        <div class="brand">
+          <div class="brand-name">VOYAGER</div>
+          <div class="brand-tagline">Plan. Explore. Discover.</div>
+        </div>
+
+        <div class="divider">
+          <div class="divider-line"></div>
+          <span class="divider-text">Create Account</span>
+          <div class="divider-line"></div>
+        </div>
+
+        <div class="server-error" id="serverError"></div>
+
+        <form id="registerForm" onsubmit="handleRegister(event)">
+
+          <div class="form-group" id="nameGroup">
+            <label for="name">Full Name</label>
+            <div class="input-wrapper">
+              <span class="input-icon"><i class="fa-regular fa-user"></i></span>
+              <input type="text" id="name" placeholder="Jane Smith" autocomplete="name" />
+            </div>
+            <div class="error-msg">Please enter your name.</div>
+          </div>
+
+          <div class="form-group" id="emailGroup">
+            <label for="email">Email</label>
+            <div class="input-wrapper">
+              <span class="input-icon"><i class="fa-regular fa-envelope"></i></span>
+              <input type="email" id="email" placeholder="you@example.com" autocomplete="email" />
+            </div>
+            <div class="error-msg">Please enter a valid email.</div>
+          </div>
+
+          <div class="form-group" id="passwordGroup">
+            <label for="password">Password</label>
+            <div class="input-wrapper">
+              <span class="input-icon"><i class="fa-solid fa-lock"></i></span>
+              <input type="password" id="password" placeholder="At least 6 characters" autocomplete="new-password" />
+              <button type="button" class="toggle-pw" onclick="togglePassword()" title="Show/hide password">
+                <i class="fa-regular fa-eye" id="eyeIcon"></i>
+              </button>
+            </div>
+            <div class="error-msg">Password must be at least 6 characters.</div>
+          </div>
+
+          <button type="submit" class="btn-login" id="registerBtn">CREATE ACCOUNT</button>
+        </form>
+
+        <div class="signup-text">
+          Already have an account? <a href="/login">Log in</a>
+        </div>
+
+      </div>
+    </div>
+    <script>
+      function togglePassword() {
+        const input = document.getElementById('password');
+        const icon  = document.getElementById('eyeIcon');
+        const show  = input.type === 'text';
+        input.type    = show ? 'password' : 'text';
+        icon.className = show ? 'fa-regular fa-eye' : 'fa-regular fa-eye-slash';
+      }
+
+      function showError(msg) {
+        const el = document.getElementById('serverError');
+        el.textContent = msg;
+        el.classList.add('visible');
+      }
+
+      async function handleRegister(e) {
+        e.preventDefault();
+        const name     = document.getElementById('name').value.trim();
+        const email    = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+        const btn      = document.getElementById('registerBtn');
+
+        document.getElementById('nameGroup').classList.remove('has-error');
+        document.getElementById('emailGroup').classList.remove('has-error');
+        document.getElementById('passwordGroup').classList.remove('has-error');
+        document.getElementById('serverError').classList.remove('visible');
+
+        let valid = true;
+        if (!name) { document.getElementById('nameGroup').classList.add('has-error'); valid = false; }
+        if (!email || !email.includes('@')) { document.getElementById('emailGroup').classList.add('has-error'); valid = false; }
+        if (password.length < 6) { document.getElementById('passwordGroup').classList.add('has-error'); valid = false; }
+        if (!valid) return;
+
+        btn.textContent = 'Creating account...';
+        btn.disabled    = true;
+
+        try {
+          const res  = await fetch('/auth/register', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({ name, email, password })
+          });
+          const data = await res.json();
+
+          if (res.ok && data.success) {
+            btn.textContent      = '✅  Account created!';
+            btn.style.background = 'linear-gradient(135deg, #2ecc71, #27ae60)';
+            btn.style.color      = 'white';
+            setTimeout(() => { window.location.href = data.redirect || '/'; }, 1000);
+          } else {
+            showError(data.message || 'Registration failed.');
+            btn.textContent = 'CREATE ACCOUNT';
+            btn.disabled    = false;
+          }
+        } catch {
+          showError('Cannot reach the server. Is it running?');
+          btn.textContent = 'CREATE ACCOUNT';
+          btn.disabled    = false;
+        }
+      }
+    </script>
+  </body>
+</html>

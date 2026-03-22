@@ -1,81 +1,107 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/jpg" href="./voyager_icon.jpeg">
-    <link rel="stylesheet" href="style.css">
-
-    
-    <script src="https://kit.fontawesome.com/a2e0e6ad65.js" crossorigin="anonymous"></script>
-
-    <title>VOYAGER</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VOYAGER</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 </head>
-
 <body>
 
-  <!-- NAVBAR -->
-  <nav class="navbar">
+<!-- NAVBAR -->
+<nav class="navbar">
     <div class="logo">VOYA<span>GER</span></div>
-
     <div class="nav-links">
-      <button class="active"><i class="fa-solid fa-calendar"></i>Planner</button>
-      <button>Assistant</button>
-      <button>Dashboard</button>
+        <button class="active" id="plannerTab">Planner</button>
+        <button id="assistantTab">Assistant</button>
     </div>
+    <div class="profile">Traveler</div>
+</nav>
 
-    <div class="profile">
-      <span>Traveler</span>
-    </div>
-  </nav>
-
-  <!-- MAIN -->
-  <div class="container">
+<!-- MAIN -->
+<div id="plannerSection">
+<div class="container">
 
     <!-- LEFT PANEL -->
     <div class="card">
-      <h2>✈ Trip Details</h2>
+        <h2>✈ Plan Your Trip</h2>
 
-      <label>Where to?</label>
-      <input type="text" placeholder="e.g., Kyoto, Japan" />
+        <form class="trip-form">
 
-      <div class="row">
-        <label>Duration</label>
-        <span>3 Days</span>
-      </div>
-      <input type="range" min="1" max="10" value="3" />
+            <label>Destination</label>
+            <input id="destination" type="text" placeholder="e.g. Paris" required>
 
-      <label>Budget Tier</label>
-      <div class="buttons">
-        <button>Budget</button>
-        <button class="active">Moderate</button>
-        <button>Luxury</button>
-      </div>
+            <label>Duration</label>
+            <div class="range-box">
+                <input id="rangeInput" type="range" min="1" max="10" value="3">
+                <span id="durationText">3 Days</span>
+            </div>
 
-      <label>Interests (Optional)</label>
-      <textarea placeholder="e.g., Food, museums, hiking..."></textarea>
+            <label>Budget <span id="budgetLabel" class="budget-label">$50/day</span></label>
+            <div class="budget-slider-wrap">
+                <div class="budget-range-display">
+                    <span class="budget-min">$0</span>
+                    <span id="budgetValue" class="budget-current">$50/day</span>
+                    <span class="budget-max">$500+</span>
+                </div>
+                <input id="budgetSlider" type="range" min="0" max="500" step="10" value="50" class="budget-slider">
+                <div class="budget-ticks budget-names">
+                    <span>$0</span>
+                    <span>$100</span>
+                    <span>$200</span>
+                    <span>$300</span>
+                    <span>$400</span>
+                    <span>$500+</span>
+                </div>
+            </div>
 
-      <button class="generate">Generate Itinerary</button>
+            <label>Interests</label>
+            <textarea id="interests" placeholder="Food, nature..."></textarea>
+
+            <button type="submit" class="generate">Generate ✨</button>
+        </form>
     </div>
 
     <!-- RIGHT PANEL -->
     <div class="preview">
-      <div class="box">
-        <h2>Ready to explore?</h2>
-        <p>Enter your destination and preferences on the left to generate a personalized AI itinerary.</p>
-      </div>
+        <div id="status" class="status"></div>
+        <div class="box">
+            <div id="map"></div>
+            <div id="output">
+                <h3>Your itinerary will appear here ✈️</h3>
+            </div>
+        </div>
     </div>
 
-  </div>
+</div>
+</div>
 
-    <script>
-  const range = document.querySelector('input[type="range"]');
-  const duration = document.querySelector('.row span');
+<!-- ASSISTANT -->
+<div id="assistantSection">
+    <div class="chat-container">
+        <div class="chat-header">
+            <div class="chat-avatar">✈</div>
+            <div>
+                <div class="chat-title">VOYAGER Assistant</div>
+                <div class="chat-subtitle">Ask me anything about travel</div>
+            </div>
+        </div>
+        <div id="chatBox" class="chat-box">
+            <div class="message bot">
+                <div class="message-text">Hey! I am VOYAGER, your AI travel assistant. Ask me about destinations, visa requirements, packing tips, budgeting, local culture — anything travel related! 🌍</div>
+            </div>
+        </div>
+        <div class="chat-input-wrap">
+            <input id="chatInput" class="chat-input-field" placeholder="e.g. What is the best time to visit Japan?">
+            <button id="sendBtn" class="chat-send-btn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
+        </div>
+    </div>
+</div>
 
-  range.addEventListener('input', () => {
-    duration.textContent = range.value + " Days";
-  });
-</script>
-   
+<script src="index.js"></script>
 </body>
 </html>
