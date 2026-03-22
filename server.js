@@ -9,7 +9,7 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const API_KEY = process.env.GEMINI_API_KEY;
+const API_KEY = process.env.MISTRAL_API_KEY;
 
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
@@ -70,48 +70,45 @@ app.get("/api/me", async (req, res) => {
     }
 });
 
-console.log("🔑 API Key:", API_KEY ? "Loaded ✅" : "Missing ❌");
+console.log("🔑 Mistral API Key:", API_KEY ? "Loaded ✅" : "Missing ❌");
 
-// Models to try in order
-const MODELS = [
-    "gemini-2.0-flash",
-    "gemini-2.0-flash-001",
-    "gemini-2.0-flash-lite",
-    "gemini-2.5-flash",
-];
+// Mistral models to try in order (faster/smaller first)
+const MODELS = ["mistral-small-latest", "mistral-large-latest"];
 
-// ── Core Gemini call with model fallback ──
-async function callGemini(promptText, maxTokens = 2048) {
+// ── Core Mistral call with model fallback ──
+async function callGemini(promptText, maxTokens = 4096) {
     for (const model of MODELS) {
         try {
-            console.log(`🤖 Trying: ${model}`);
+            console.log(`🤖 Calling Mistral: ${model}`);
 
             const controller = new AbortController();
-            const timeout = setTimeout(() => controller.abort(), 15000);
+            const timeout = setTimeout(() => controller.abort(), 60000);
 
-            const response = await fetch(
-                `https://generativelanguage.googleapis.com/v1/models/${model}:generateContent?key=${API_KEY}`,
-                {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        contents: [{ role: "user", parts: [{ text: promptText }] }],
-                        generationConfig: { temperature: 0.7, maxOutputTokens: 8192 }
-                    }),
-                    signal: controller.signal
-                }
-            );
+            const response = await fetch("https://api.mistral.ai/v1/chat/completions", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${API_KEY}`
+                },
+                body: JSON.stringify({
+                    model: model,
+                    messages: [{ role: "user", content: promptText }],
+                    temperature: 0.7,
+                    max_tokens: maxTokens
+                }),
+                signal: controller.signal
+            });
 
             clearTimeout(timeout);
 
             if (!response.ok) {
                 const err = await response.json().catch(() => ({}));
-                console.log(`⚠️ ${model} failed: ${err?.error?.message || response.status}`);
+                console.log(`⚠️ ${model} failed: ${err?.message || response.status}`);
                 continue;
             }
 
             const data = await response.json();
-            const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+            const text = data?.choices?.[0]?.message?.content;
 
             if (!text) {
                 console.log(`⚠️ ${model} returned empty`);
@@ -119,7 +116,7 @@ async function callGemini(promptText, maxTokens = 2048) {
             }
 
             console.log(`✅ Got response from ${model}`);
-            console.log('📝 Raw text:', text.substring(0, 500));
+            console.log("📝 Raw text:", text.substring(0, 300));
             return { text, model };
 
         } catch (err) {
@@ -132,7 +129,7 @@ async function callGemini(promptText, maxTokens = 2048) {
 
 // Health
 app.get("/health", (req, res) => {
-    res.json({ status: "ok", gemini: API_KEY ? "connected" : "not configured", models: MODELS });
+    res.json({ status: "ok", mistral: API_KEY ? "connected" : "not configured", models: MODELS });
 });
 
 // Generate itinerary
@@ -241,7 +238,7 @@ IMPORTANT RULES:
 - Safety tips must be specific to the destination — not generic advice.
 Output ONLY the JSON object. Start with { and end with }.`;
 
-        const result = await callGemini(systemPrompt);
+        const result = await callGemini(systemPrompt, 4096);
 
         if (!result) {
             return res.json({ success: false, error: "All models rate limited. Wait a minute and try again." });
@@ -251,10 +248,11 @@ Output ONLY the JSON object. Start with { and end with }.`;
 
         console.log("📝 Raw text preview:", rawText.substring(0, 300));
 
-        // Strip markdown fences like ```json ... ```
+        // Aggressive JSON cleaning for Mistral responses
         let cleaned = rawText
             .replace(/```json\s*/gi, "")
             .replace(/```\s*/g, "")
+            .replace(/^[^{]*/s, "")   // remove anything before first {
             .trim();
 
         // Slice from first { to last }
@@ -268,13 +266,34 @@ Output ONLY the JSON object. Start with { and end with }.`;
 
         cleaned = cleaned.slice(firstBrace, lastBrace + 1);
 
+        // Fix common Mistral JSON issues: trailing commas
+        cleaned = cleaned
+            .replace(/,\s*}/g, "}")
+            .replace(/,\s*]/g, "]");
+
         let parsed;
         try {
             parsed = JSON.parse(cleaned);
         } catch (e) {
             console.error("❌ JSON parse failed:", e.message);
-            console.error("❌ Attempted:", cleaned.substring(0, 500));
-            return res.json({ success: false, error: "AI returned malformed JSON" });
+            // Attempt to recover truncated JSON
+            try {
+                let fix = cleaned;
+                // Close any open arrays/objects by counting brackets
+                const opens = (fix.match(/[\[{]/g) || []).length;
+                const closes = (fix.match(/[\]}]/g) || []).length;
+                const diff = opens - closes;
+                // Remove trailing incomplete entry
+                const lastComma = fix.lastIndexOf('},{');
+                if (lastComma > 0) fix = fix.slice(0, lastComma) + '}]';
+                // Close remaining open structures
+                for (let i = 0; i < diff - 1; i++) fix += '}';
+                fix += '}';
+                parsed = JSON.parse(fix);
+                console.log("⚠️ Recovered truncated JSON");
+            } catch {
+                return res.json({ success: false, error: "Response too long — try fewer days or simpler interests" });
+            }
         }
 
         if (!parsed.destination || !parsed.itinerary) {
@@ -298,7 +317,7 @@ app.post("/chat", async (req, res) => {
         if (!message) return res.json({ success: false, error: "No message provided" });
 
         if (!API_KEY) {
-            return res.json({ success: true, reply: "I'm VOYAGER! (Add Gemini API key to .env for real answers.)" });
+            return res.json({ success: true, reply: "I'm VOYAGER! (Add Mistral API key to .env for real answers.)" });
         }
 
         const historyText = (history || []).map(h => `${h.role === "user" ? "User" : "Assistant"}: ${h.text}`).join("\n");
@@ -320,6 +339,6 @@ app.post("/chat", async (req, res) => {
 
 app.listen(PORT, () => {
     console.log(`\n🚀 Server running at http://localhost:${PORT}`);
-    console.log(`🔑 Gemini: ${API_KEY ? "Connected ✅" : "NOT configured ⚠️"}`);
+    console.log(`🔑 Mistral: ${API_KEY ? "Connected ✅" : "NOT configured ⚠️"}`);
     console.log(`📋 Models: ${MODELS.join(" → ")}\n`);
 });
