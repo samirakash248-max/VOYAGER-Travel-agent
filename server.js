@@ -321,13 +321,45 @@ app.post("/chat", async (req, res) => {
         }
 
         const historyText = (history || []).map(h => `${h.role === "user" ? "User" : "Assistant"}: ${h.text}`).join("\n");
-        const fullPrompt = `You are VOYAGER, a friendly travel assistant. Answer travel questions concisely.\n\n${historyText}\nUser: ${message}\nAssistant:`;
+        const fullPrompt = `You are VOYAGER, an expert AI travel assistant. Your ONLY purpose is to help with travel-related topics.
+
+TOPICS YOU CAN HELP WITH:
+- Destinations, attractions, and things to do
+- Visa requirements, passports, and travel documents
+- Flights, trains, buses, and transportation
+- Hotels, hostels, Airbnbs, and accommodation
+- Travel budgeting and money tips
+- Packing lists and what to bring
+- Local culture, customs, food, and etiquette
+- Weather and best times to visit
+- Travel safety and health tips
+- Travel insurance
+- Itinerary planning and trip ideas
+
+IF THE USER ASKS ABOUT ANYTHING UNRELATED TO TRAVEL (e.g. coding, math, politics, relationships, entertainment, general knowledge):
+- Politely decline in 1-2 sentences
+- Remind them you are a travel-only assistant
+- Offer to help with a travel question instead
+- Never answer the non-travel question even partially
+
+Keep responses concise, friendly and helpful. Use bullet points for lists.
+
+${historyText ? 'Conversation so far:\n' + historyText + '\n' : ''}User: ${message}
+VOYAGER:`;
 
         const result = await callGemini(fullPrompt, 512);
 
         if (!result) return res.json({ success: false, error: "Rate limited. Please wait a moment." });
 
-        res.json({ success: true, reply: result.text });
+        // Clean markdown formatting from reply
+        const clean = result.text
+            .replace(/\*\*([^*]+)\*\*/g, '$1')
+            .replace(/\*([^*]+)\*/g, '$1')
+            .replace(/#{1,6}\s/g, '')
+            .replace(/VOYAGER:\s*/g, '')
+            .trim();
+
+        res.json({ success: true, reply: clean });
 
     } catch (err) {
         console.error("❌ Chat error:", err.message);
