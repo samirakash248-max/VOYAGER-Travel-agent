@@ -4,18 +4,30 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="author" content="monarch" />
-    <title>Voyager - Top destinations</title>
+    <title>Voyager - Top Destinations</title>
     <link rel="stylesheet" href="landing_page2.css" />
     <link rel="icon" href="img/voyager_icon.jpeg">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
   </head>
   <body>
+
     <header class="navbar">
-      <h1>Voy<span class="font-name">ager</span></h1>
+      <a href="/" class="nav-logo">Voy<span class="font-name">ager</span></a>
+      <div class="nav-actions">
+        <a href="/" class="nav-back">← Back to Home</a>
+        <a href="/login" class="nav-cta-btn">Plan a Trip →</a>
+      </div>
     </header>
 
+    <div class="page-header">
+      <span class="section-tag">✦ Best Offers</span>
+      <h2 class="page-title">Top Destinations</h2>
+      <p class="page-sub">Click any destination to start planning your trip</p>
+    </div>
+
     <div class="pkg-grid">
-      <!-- 1st -->
-      <div class="pkg-card">
+
+      <div class="pkg-card" onclick="bookPackage('United Kingdom')" style="cursor:pointer">
         <div class="pkg-img">
           <img src="img/unitedKingdom.png" alt="UK" />
           <span class="pkg-tag hot">🔥 Hot Deal</span>
@@ -36,8 +48,7 @@
         </div>
       </div>
 
-      <!-- 2nd -->
-      <div class="pkg-card">
+      <div class="pkg-card" onclick="bookPackage('Spain')" style="cursor:pointer">
         <div class="pkg-img">
           <img src="img/spain.png" alt="Spain" />
           <span class="pkg-tag">New</span>
@@ -58,8 +69,7 @@
         </div>
       </div>
 
-      <!-- 3rd -->
-      <div class="pkg-card">
+      <div class="pkg-card" onclick="bookPackage('Istanbul')" style="cursor:pointer">
         <div class="pkg-img">
           <img src="img/Istanbul.png" alt="Turkey" />
           <span class="pkg-tag hot">🔥 Hot Deal</span>
@@ -80,8 +90,7 @@
         </div>
       </div>
 
-      <!-- 4th -->
-      <div class="pkg-card">
+      <div class="pkg-card" onclick="bookPackage('Japan')" style="cursor:pointer">
         <div class="pkg-img">
           <img src="img/Mt.fuji.png" alt="Japan" />
           <span class="pkg-tag">Premium</span>
@@ -102,8 +111,7 @@
         </div>
       </div>
 
-      <!-- 5th -->
-      <div class="pkg-card">
+      <div class="pkg-card" onclick="bookPackage('India')" style="cursor:pointer">
         <div class="pkg-img">
           <img src="img/india.png" alt="India" />
         </div>
@@ -114,18 +122,16 @@
             <span class="rating-cnt">(235 reviews)</span>
           </div>
           <div class="pkg-name">India</div>
-          <div class="pkg-loc">📍 Manali, kullu</div>
+          <div class="pkg-loc">📍 Manali, Kullu</div>
           <div class="pkg-features">
             <span class="feat-chip">✈ Flights</span>
-            <span class="feat-chip"> 🏨 Hotel</span>
-            <span class="feat-chip"> Sking</span>
+            <span class="feat-chip">🏨 Hotel</span>
+            <span class="feat-chip">⛷ Skiing</span>
           </div>
         </div>
       </div>
 
-      <!-- 6th -->
-
-      <div class="pkg-card">
+      <div class="pkg-card" onclick="bookPackage('Australia')" style="cursor:pointer">
         <div class="pkg-img">
           <img src="img/australia.png" alt="Australia" />
           <span class="pkg-tag">Premium</span>
@@ -136,19 +142,17 @@
             <span class="rating-val">4.7</span>
             <span class="rating-cnt">(379 reviews)</span>
           </div>
-          <div class="pkg-name">Australia - where the sunset paints the sky </div>
+          <div class="pkg-name">Australia — Where the Sunset Paints the Sky</div>
           <div class="pkg-loc">📍 Opera House, New South Wales</div>
           <div class="pkg-features">
             <span class="feat-chip">✈ Flights</span>
-            <span class="feat-chip"> 🏨 Hostel</span>
+            <span class="feat-chip">🏨 Hostel</span>
             <span class="feat-chip">🚌 Transfers</span>
           </div>
         </div>
       </div>
 
-      <!-- 7th -->
-
-      <div class="pkg-card">
+      <div class="pkg-card" onclick="bookPackage('Germany')" style="cursor:pointer">
         <div class="pkg-img">
           <img src="img/Germany.png" alt="Germany" />
           <span class="pkg-tag hot">🔥 Hot Deal</span>
@@ -159,21 +163,20 @@
             <span class="rating-val">4.6</span>
             <span class="rating-cnt">(404 reviews)</span>
           </div>
-          <div class="pkg-name">Germany </div>
+          <div class="pkg-name">Germany</div>
           <div class="pkg-loc">📍 Berlin, Hamburg, Munich</div>
           <div class="pkg-features">
             <span class="feat-chip">✈ Flights</span>
-            <span class="feat-chip">Eltz Castle</span>
+            <span class="feat-chip">🏰 Eltz Castle</span>
+            <span class="feat-chip">🍺 Culture</span>
           </div>
         </div>
       </div>
 
-      <!-- 8th -->
-
-      <div class="pkg-card">
+      <div class="pkg-card" onclick="bookPackage('UAE')" style="cursor:pointer">
         <div class="pkg-img">
-          <img src="img/uae.webp" alt="iran" />
-          <span class="pkg-tag">new</span>
+          <img src="img/uae.png" alt="UAE" />
+          <span class="pkg-tag">New</span>
         </div>
         <div class="pkg-body">
           <div class="pkg-rating">
@@ -182,13 +185,32 @@
             <span class="rating-cnt">(298 reviews)</span>
           </div>
           <div class="pkg-name">UAE</div>
-          <div class="pkg-loc">📍 Dubai, Morocco</div>
+          <div class="pkg-loc">📍 Dubai, Abu Dhabi</div>
           <div class="pkg-features">
             <span class="feat-chip">✈ Flights</span>
-            <span class="feat-chip">Burj Khalifa</span>
+            <span class="feat-chip">🏙 Burj Khalifa</span>
+            <span class="feat-chip">🏜 Desert Safari</span>
           </div>
         </div>
       </div>
+
     </div>
+
+    <script>
+      async function bookPackage(destination) {
+        try {
+          const res  = await fetch('/api/me');
+          const data = await res.json();
+          if (data.loggedIn) {
+            window.location.href = '/app?dest=' + encodeURIComponent(destination);
+          } else {
+            window.location.href = '/login?dest=' + encodeURIComponent(destination);
+          }
+        } catch {
+          window.location.href = '/login?dest=' + encodeURIComponent(destination);
+        }
+      }
+    </script>
+
   </body>
 </html>
